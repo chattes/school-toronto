@@ -1,0 +1,60 @@
+{
+    "configurations": [
+        {
+            "type": "aws-sam",
+            "request": "direct-invoke",
+            "name": "get-school-details:SchoolDetailsFunction (nodejs14.x)",
+            "invokeTarget": {
+                "target": "template",
+                "templatePath": "get-school-details/template.yaml",
+                "logicalId": "SchoolDetailsFunction"
+            },
+            "lambda": {
+                "payload": {},
+                "environmentVariables": {}
+            }
+        },
+        {
+            "type": "aws-sam",
+            "request": "direct-invoke",
+            "name": "process-schools-queue:ProcessQueue (nodejs14.x)",
+            "invokeTarget": {
+                "target": "template",
+                "templatePath": "process-schools-queue/template.yaml",
+                "logicalId": "ProcessQueue"
+            },
+            "lambda": {
+                "payload": {},
+                "environmentVariables": {}
+            }
+        },
+        {
+            "type": "aws-sam",
+            "request": "direct-invoke",
+            "name": "get-school-info:HelloWorldFunction (nodejs14.x)",
+            "invokeTarget": {
+                "target": "template",
+                "templatePath": "get-school-info/template.yaml",
+                "logicalId": "HelloWorldFunction"
+            },
+            "lambda": {
+                "payload": {},
+                "environmentVariables": {}
+            }
+        },
+        {
+            "type": "aws-sam",
+            "request": "direct-invoke",
+            "name": "get-schools-toronto:HelloWorldFunction (nodejs14.x)",
+            "invokeTarget": {
+                "target": "template",
+                "templatePath": "get-schools-toronto/template.yaml",
+                "logicalId": "HelloWorldFunction"
+            },
+            "lambda": {
+                "payload": {},
+                "environmentVariables": {}
+            }
+        },
+    ]
+}
