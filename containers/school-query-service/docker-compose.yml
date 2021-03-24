@@ -1,0 +1,18 @@
+version: '3.7'
+
+services:
+  schools-service:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: base
+    volumes:
+      - ./src:/app/src
+      - ./nodemon.json:/app/nodemon.json
+    container_name: ts-node-docker
+    expose:
+      - '3000'
+    ports:
+      - '3000:3000'
+      - '9229:9229'
+    command: npm run dev
