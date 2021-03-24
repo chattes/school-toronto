@@ -5,6 +5,8 @@ let response;
 
 aws.config.update({ region: "us-east-2" });
 const ddb = new aws.DynamoDB({ apiVersion: "2012-08-10" });
+const dynamoClient = new aws.DynamoDB.DocumentClient();
+const DO_DIFFING = true;
 
 /**
  *
@@ -38,7 +40,7 @@ exports.lambdaHandler = async (event, context) => {
     });
 
     const allSchools = await Promise.all([schoolsTdsb, schoolsTcdsb]);
-    const torontoSchools = allSchools
+    let torontoSchools = allSchools
       .reduce((acc, school) => {
         const schoolData = school.data;
         return [...acc, ...schoolData];
@@ -70,22 +72,28 @@ exports.lambdaHandler = async (event, context) => {
           board,
           fraser_rating,
           "eqao-rating": eqao_rating,
-          record_last_processed: Date.now()
+          record_last_processed: Date.now(),
         }))(school);
       });
 
-    console.log("ALL:", torontoSchools.length);
-    console.log(
-      "Public",
-      torontoSchools.filter((s) => s.is_catholic === false).length
-    );
-    console.log(
-      "Top::",
-      torontoSchools.filter((s) => s.eqao_rating > 80).length
-    );
+    if (DO_DIFFING) {
+      console.log(" Doing a diff..");
+      const queryGet = {
+        TableName: "schools-toronto",
+      };
+      const existingItems = await batchGetItems(queryGet, []);
+      torontoSchools = torontoSchools.filter((school) => {
+        return (
+          existingItems.findIndex(
+            (existingSchool) =>
+              existingSchool["school-id"] == school["school-id"]
+          ) < 0
+        );
+      });
+    }
+    console.log("Diffed Result:::", torontoSchools.length);
     await saveData(torontoSchools);
   } catch (err) {
-    console.log(err);
     return err;
   }
 
@@ -113,8 +121,8 @@ const saveData = async (data) => {
           o[key] = { BOOL: val };
           continue;
         }
-        if(key === "record_last_processed"){
-            o[key] = { N: val.toString() }
+        if (key === "record_last_processed") {
+          o[key] = { N: val.toString() };
         }
         o[key] = { S: val.toString() };
       }
@@ -140,16 +148,11 @@ const saveData = async (data) => {
         },
       };
 
-      console.log("Writing batch items");
-
       writePromise.push(ddb.batchWriteItem(params).promise());
     }
     const writeResults = await Promise.all(writePromise);
-    console.log(writeResults);
     return;
-  } catch (error) {
-    console.log("Error writing data", error);
-  }
+  } catch (error) {}
 };
 
 const batch = (start, end, arr, res) => {
@@ -161,4 +164,18 @@ const batch = (start, end, arr, res) => {
   res.push(arr.slice(start, end));
   let diff = end - start;
   return batch(end, end + diff, arr, res);
+};
+
+const batchGetItems = async (query, items) => {
+  const tResult = await dynamoClient.scan(query).promise();
+  const tResultCurrentBatch = tResult.Items || [];
+
+  items = [...items, ...tResultCurrentBatch];
+
+  if (tResult.LastEvaluatedKey === undefined) {
+    return items;
+  } else {
+    query.ExclusiveStartKey = tResult.LastEvaluatedKey;
+    return await batchGetItems(query, items);
+  }
 };
