@@ -3,5 +3,11 @@ version: '3.7'
 services:
   ts-node-docker:
     build:
+      context: .
+      dockerfile: Dockerfile
       target: production
-    command: node dist/index.js
+    expose:
+      - '3000'
+    ports:
+      - '3000:3000'
+    command: node bin/www
