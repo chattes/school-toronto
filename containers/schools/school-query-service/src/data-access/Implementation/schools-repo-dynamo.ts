@@ -1,11 +1,11 @@
-import { ISchoolRepo } from '../ISchoolRepo';
+import { ICache, ISchoolRepo } from '../ISchoolRepo';
 import { left } from '../../shared/Result';
 import AWS from 'aws-sdk';
 import { AppError } from '../../shared/AppError';
 import { areaDao, locationDao } from '../../domain/schools/daos/schools';
 import { SchoolMapper } from '../../domain/schools/mapper';
 import { SchoolResult } from '../../domain/schools/school';
-import { promisify } from 'util';
+import { RedisCache } from './schools-repo-redis';
 
 const AWS_ACCESS = process.env.AWS_ACCESS_KEY;
 const AWS_SECRET = process.env.AWS_SECRET;
@@ -15,9 +15,14 @@ const awsConfig = {
   region: 'us-east-2'
 };
 AWS.config.update(awsConfig);
+
 const ddb = new AWS.DynamoDB.DocumentClient();
 
 export class SchoolsRepo implements ISchoolRepo<SchoolResult> {
+  private redisCache: ICache;
+  constructor(cache: ICache) {
+    this.redisCache = cache;
+  }
   async findSchoolsByArea(
     area: areaDao
   ): Promise<SchoolResult[] | SchoolResult> {
@@ -37,8 +42,16 @@ export class SchoolsRepo implements ISchoolRepo<SchoolResult> {
       }
     };
 
-    const response = await ddb.query(query).promise();
-    const schoolRawCollection = response.Items ? response.Items : [];
+    let schoolRawCollection: Array<any> = [];
+    const cacheKey = RedisCache.generateHashKey(JSON.stringify(query));
+    schoolRawCollection = await this.redisCache.get(cacheKey);
+
+    if (!schoolRawCollection) {
+      const response = await ddb.query(query).promise();
+      schoolRawCollection = response.Items ? response.Items : [];
+      await this.redisCache.set(cacheKey, schoolRawCollection);
+    }
+
     let schoolDomainCollection = schoolRawCollection.map((schoolRaw) =>
       SchoolMapper.toDomain(schoolRaw)
     );

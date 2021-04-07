@@ -1,0 +1,65 @@
+version: "3.1"
+
+services:
+  redis-sentinel:
+    image: 127.0.0.1:5000/redis-sentinel:${TAG:-latest}
+    environment:
+      - REDIS_IP=redis-zero
+      - REDIS_MASTER_NAME=redismaster
+    deploy:
+      replicas: 3
+      resources:
+        limits:
+          memory: 300M
+    networks:
+      - redis
+
+  redis:
+    image: 127.0.0.1:5000/redis-look:${TAG:-latest}
+    environment:
+      - REDIS_SENTINEL_IP=redis-sentinel
+      - REDIS_MASTER_NAME=redismaster
+      - REDIS_SENTINEL_PORT=26379
+    deploy:
+      replicas: 3
+      resources:
+        limits:
+          memory: 1.5G
+    networks:
+      - redis
+  app:
+    image: 127.0.0.1:5000/node-app
+    depends_on:
+      - redis
+      - redis-sentinel
+    environment:
+      - REDIS_SENTINEL_IP=redis-sentinel
+      - REDIS_MASTER=redismaster
+      - REDIS_SENTINEL_PORT=26379
+      - AWS_ACCESS_KEY=/run/secrets/aws_access_key
+      - AWS_SECRET=/run/secrets/aws_secret
+    deploy:
+      replicas: 5
+      resources:
+        limits:
+          cpus: "0.5"
+          memory: 350M
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+        max_attempts: 3
+        window: 120s
+    networks:
+      - redis
+    secrets:
+      - aws_access_key
+      - aws_secret
+
+secrets:
+  aws_access_key:
+    file: /tmp/aws_access_key.txt
+  aws_secret:
+    file: /tmp/aws_secret.txt
+networks:
+  redis:
+    external: true

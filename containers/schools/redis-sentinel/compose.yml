@@ -1,0 +1,7 @@
+version: "3.3"
+services:
+  redis-sentinel:
+    image: 127.0.0.1:5000/redis-sentinel
+    build:
+      context: .
+      dockerfile: ./Dockerfile
