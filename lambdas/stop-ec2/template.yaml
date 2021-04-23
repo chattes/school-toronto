@@ -10,7 +10,7 @@ Resources:
   EC2StopFunction:
     Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
     Properties:
-      CodeUri: control-ec2/
+      CodeUri: stop-ec2/
       Handler: app.lambdaHandler
       Runtime: nodejs14.x
       Role: "arn:aws:iam::241056173073:role/LambdaRoleChattes1"
