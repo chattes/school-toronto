@@ -1,0 +1,12 @@
+version: "3.7"
+
+services:
+  maps-service:
+    image: klokantech/tileserver-gl
+    volumes:
+      - /Users/souravchatterjee/Development/side-projects/test-maps:/data
+    container_name: world-map
+    expose:
+      - "80"
+    ports:
+      - "8080:80"

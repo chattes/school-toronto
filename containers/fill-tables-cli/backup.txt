@@ -1,0 +1,74 @@
+/* eslint-disable @typescript-eslint/no-var-requires */
+const dotenv = require('dotenv');
+const AWS = require('aws-sdk');
+const fs = require('fs');
+const util = require('util');
+dotenv.config();
+const writePromise = util.promisify(fs.writeFile);
+
+//Keys
+
+const AWS_ACCESS = process.env.AWS_ACCESS_KEY;
+const AWS_SECRET = process.env.AWS_SECRET;
+const awsConfig = {
+  accessKeyId: AWS_ACCESS,
+  secretAccessKey: AWS_SECRET,
+  region: 'us-east-2'
+};
+AWS.config.update(awsConfig);
+const ddb = new AWS.DynamoDB.DocumentClient();
+
+const sleep = (delay) => {
+  return new Promise((res) => setTimeout(res, delay));
+};
+
+const scanDocuments = async (query, items) => {
+  const tResult = await ddb.scan(query).promise();
+  const tResultCurrentBatch = tResult.Items || [];
+
+  console.log('Scanning Items...');
+
+  items = [...items, ...tResultCurrentBatch];
+
+  if (tResult.LastEvaluatedKey === undefined) {
+    return items;
+  } else {
+    query.ExclusiveStartKey = tResult.LastEvaluatedKey;
+    return await scanDocuments(query, items).catch(async function (error) {
+      if (error.code === 'ProvisionedThroughputExceededException') {
+        console.log('Error while Reading Docs... Eh! wait a minute');
+        await sleep(20000);
+        return await scanDocuments(query, items);
+      }
+      console.error(
+        'An unexpected error has occured while reading Documents',
+        error
+      );
+      return [];
+    });
+  }
+};
+
+const start = async () => {
+  try {
+    const query = {
+      TableName: 'schools-toronto'
+    };
+    const allItems = await scanDocuments(query, []);
+    console.log('Total Number of Documents::', allItems.length);
+
+    await writePromise('../school-gta.json', JSON.stringify(allItems), {
+      encoding: 'utf-8'
+    });
+
+    console.log('All Data Written');
+
+    // Write the data as JSON to a file
+
+    process.exit();
+  } catch (error) {
+    console.log('An error occured', error);
+  }
+};
+
+start();

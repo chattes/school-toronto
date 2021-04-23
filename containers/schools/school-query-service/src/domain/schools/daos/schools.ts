@@ -1,6 +1,13 @@
 export type locationDao = {
-  latitude: number;
-  longitude: number;
+  centerPoint: {
+    latitude: number;
+    longitude: number;
+  };
+  radiusInMeters: number;
+  filters: {
+    minRating: number;
+    onlyPublic: boolean;
+  };
 };
 
 export enum AREAS {

@@ -5,6 +5,7 @@ import logger from 'morgan';
 
 import indexRouter from './routes/index';
 import schoolsRouter from './routes/schools';
+import cors from 'cors';
 
 const app = express();
 
@@ -12,6 +13,7 @@ app.use(logger('dev'));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
+app.use(cors());
 // app.use(express.static(path.join(__dirname, 'public')));
 
 app.use('/', indexRouter);

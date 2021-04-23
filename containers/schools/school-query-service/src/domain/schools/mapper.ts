@@ -18,13 +18,14 @@ export class SchoolMapper {
       board: raw['board'],
       city: raw['city'],
       eqaoRating: raw['eqao-rating'],
-      fraserRating: raw['fraser-rating'],
+      fraserRating: raw['fraser_rating'],
       isCatholic: raw['is_catholic'],
       language: schoolLangauge,
       level: schoolLevel,
       location: location.value,
       schoolId: raw['school-id'],
-      type: raw['type']
+      type: raw['type'],
+      boundaries: raw['boundaries']
     });
   }
 }

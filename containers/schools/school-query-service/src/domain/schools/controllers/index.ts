@@ -1,8 +1,10 @@
 import {
+  getSchoolByCoordinates,
   getSchoolByIdUseCase,
   getTopSchoolByArea
 } from '../use-cases/getSchools';
 import { GetSchoolByAreaController } from './getSchoolByAreaController';
+import { GetSchoolByCoordsController } from './getSchoolByCoordsController';
 import { GetSchoolByIdController } from './getSchoolsByIdController';
 
 const getSchoolByIdController = new GetSchoolByIdController(
@@ -11,5 +13,12 @@ const getSchoolByIdController = new GetSchoolByIdController(
 const getSchoolsByAreaController = new GetSchoolByAreaController(
   getTopSchoolByArea
 );
+const getSchoolsByCoordinatesController = new GetSchoolByCoordsController(
+  getSchoolByCoordinates
+);
 
-export { getSchoolByIdController, getSchoolsByAreaController };
+export {
+  getSchoolByIdController,
+  getSchoolsByAreaController,
+  getSchoolsByCoordinatesController
+};

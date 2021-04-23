@@ -12,6 +12,8 @@ REDIS_MASTER_NAME="redismaster"
 echo "Starting redis-zero"
 docker service create --network redis --name redis-zero redis:4.0.11-alpine
 
+
+
 echo "1- Start to push on registry the redis docker image which can be used as master or slave in the stack..."
 docker-compose -f redis-look/compose.yml build
 docker-compose -f redis-look/compose.yml push
@@ -34,6 +36,12 @@ echo "2- Start to push on registry the node app image"
 docker-compose -f school-query-service/docker-compose.prod.yml build
 docker-compose -f school-query-service/docker-compose.prod.yml push
 echo "(2)End to build and push node app"
+echo "-------------------------------------------------------\n"
+
+echo "5 - Setting up Nginx Web Server"
+docker-compose -f nginx-proxy/compose.yml build
+docker-compose -f nginx-proxy/compose.yml push
+echo "(1)End to build and push nginx image to registry."
 echo "-------------------------------------------------------\n"
 
 

@@ -52,8 +52,10 @@ const scanDocuments = async (query) => {
         },
       };
 
+      console.log(`Processing DB entry for ${schoolId}`);
       updPromise.push(ddb.update(update).promise());
       // Process DynamoDB entries and send to message queue
+      console.log(`Entry Queue for ${schoolId}`);
       var params = {
         // Remove DelaySeconds parameter and value for FIFO queues
         DelaySeconds: (Math.floor(Math.random() * 14) + 1) * 60,
@@ -68,15 +70,17 @@ const scanDocuments = async (query) => {
       };
 
       await sqs.sendMessage(params).promise();
-      await Promise.all(updPromise);
-      return;
     }
+
+    await Promise.all(updPromise);
+    return;
   }
 };
 exports.lambdaHandler = async (event, context) => {
   try {
-    let dateBefore = new Date().getTime() - 60000 * 60 * 24 * 4;
+    let dateBefore = new Date().getTime() - 60000 * 60 * 24 * 19;
     console.log(dateBefore);
+    /**
     const query = {
       TableName: "schools-toronto",
       ProjectionExpression: "#id,#rating, #school_url, #school_name, #record",
@@ -92,8 +96,23 @@ exports.lambdaHandler = async (event, context) => {
         ":dateBefore": dateBefore.toString(),
       },
     };
-    await scanDocuments(query)
-    return
+    **/
+
+    const query = {
+      TableName: "schools-toronto",
+      ProjectionExpression: "#id,#rating, #school_url, #school_name, #record",
+      FilterExpression: "attribute_not_exists(location_data)",
+      ExpressionAttributeNames: {
+        "#record": "record_last_processed",
+        "#id": "school-id",
+        "#rating": "eqao-rating",
+        "#school_url": "url",
+        "#school_name": "name",
+      },
+    };
+
+    await scanDocuments(query);
+    return;
   } catch (err) {
     console.log("Error occcured during Update Operation", err);
     return err;

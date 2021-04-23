@@ -20,6 +20,7 @@ export type SchoolProps = {
   name: string;
   type: string;
   location: SchoolLocation;
+  boundaries: Array<any>;
 };
 export class School {
   private props: SchoolProps;
@@ -43,7 +44,7 @@ export class School {
   public get fraserRating() {
     return this.props.fraserRating;
   }
-  public get cathoic() {
+  public get catholic() {
     return !!this.props.isCatholic;
   }
   public get language() {
@@ -63,6 +64,10 @@ export class School {
 
   public get location() {
     return [this.props.location.latitude, this.props.location.longitude];
+  }
+
+  public get boundaries() {
+    return this.props.boundaries;
   }
 
   public static create(school: SchoolProps): SchoolResult {

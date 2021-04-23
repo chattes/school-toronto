@@ -1,0 +1,109 @@
+.map-container {
+  position: absolute;
+  top: 0;
+  right: 0;
+  left: 0;
+  bottom: 0;
+  height: 100vh;
+}
+
+.topbar {
+  background-color: rgba(35, 55, 75, 0.9);
+  color: #ffffff;
+  height: 6vh;
+  z-index: 1;
+  position: absolute;
+  top: 0;
+  left: 0;
+  display: grid;
+  grid-template-columns: [header1] 35% [header2] 25% [header3] auto;
+  gap: 10%;
+  width: 100vw;
+}
+.title {
+  grid-area: header1;
+  align-self: center;
+  justify-self: start;
+  height: 100%;
+}
+.feedback {
+  grid-area: header3;
+  align-self: center;
+  justify-self: end;
+  height: 100%;
+}
+.cta {
+  color: whitesmoke;
+}
+
+.cta:hover {
+  color: yellowgreen;
+}
+
+.sidebar {
+  background-color: rgba(35, 55, 75, 0.7);
+  color: #ffffff;
+  height: 5vh;
+  font: 15px/24px monospace;
+  z-index: 1;
+  position: absolute;
+  bottom: 25px;
+  left: 10px;
+  border-radius: 4px;
+  padding: 5px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.settings {
+  z-index: 1;
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  width: 40px;
+  height: 40px;
+  margin-bottom: 30px;
+  margin-right: 15px;
+  object-fit: contain;
+  border: 1px solid black;
+  border-radius: 20px;
+  padding: 5px;
+  background-color: #ffffff;
+  box-shadow: 0 1px rgb(61, 88, 95);
+}
+.settings:hover {
+  background-color: #7c92f3;
+  color: #050f38;
+  cursor: pointer;
+}
+.settings:active {
+  transform: translateY(5px);
+  box-shadow: 0 0px rgb(61, 88, 95);
+}
+
+.my-icon {
+  border-radius: 100%;
+  width: 10px;
+  height: 10px;
+  text-align: center;
+  line-height: 10px;
+  color: white;
+  object-fit: contain;
+}
+
+.icon-dc {
+  background: #c43bd0;
+}
+
+.icon-sf {
+  background: #09a758;
+}
+
+.school-ellipsis {
+  width: 500px;
+  padding: 5px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}

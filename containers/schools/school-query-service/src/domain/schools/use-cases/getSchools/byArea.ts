@@ -1,6 +1,5 @@
 import { ISchoolRepo } from '../../../../data-access/ISchoolRepo';
 import { UseCases } from '../../../../shared/UseCases';
-import { AREAS } from '../../daos/schools';
 import { SchoolResult } from '../../school';
 import { GetSchoolByAreaDTO } from './dtos/dtoGetSchoolByArea';
 

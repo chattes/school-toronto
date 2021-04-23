@@ -6,7 +6,7 @@ let response;
 aws.config.update({ region: "us-east-2" });
 const ddb = new aws.DynamoDB({ apiVersion: "2012-08-10" });
 const dynamoClient = new aws.DynamoDB.DocumentClient();
-const DO_DIFFING = true;
+const DO_DIFFING = false;
 
 /**
  *
@@ -22,24 +22,20 @@ const DO_DIFFING = true;
  */
 exports.lambdaHandler = async (event, context) => {
   try {
-    const schoolsTdsb = axios({
-      url,
-      method: "get",
-      params: {
-        region: "tdsb",
-      },
-      timeout: 5000,
-    });
-    const schoolsTcdsb = axios({
-      url,
-      method: "get",
-      params: {
-        region: "tcdsb",
-      },
-      timeout: 5000,
-    });
+    const boards = ["pdsb", "dcdsb", "ddsb", "dpcdsb", "hcdsb", "hdsb"];
 
-    const allSchools = await Promise.all([schoolsTdsb, schoolsTcdsb]);
+    const boardRequests = boards.map((board) =>
+      axios({
+        url,
+        method: "get",
+        params: {
+          region: board,
+        },
+        timeout: 5000,
+      })
+    );
+
+    const allSchools = await Promise.all(boardRequests);
     let torontoSchools = allSchools
       .reduce((acc, school) => {
         const schoolData = school.data;

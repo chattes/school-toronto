@@ -151,7 +151,7 @@ const createSchoolsGeoTable = async () => {
   geoConfig.hashKeyLength = 6;
   const createTableInput = GeoTableUtil.getCreateTableRequest(geoConfig);
   if (createTableInput.ProvisionedThroughput) {
-    createTableInput.ProvisionedThroughput.ReadCapacityUnits = 2;
+    createTableInput.ProvisionedThroughput.ReadCapacityUnits = 20;
   }
   return ddBatch
     .createTable(createTableInput)
@@ -195,7 +195,8 @@ const fillGeoData = async (data: Array<SchoolDomain>) => {
           boundaries: school.boundaries,
           url: school.url,
           location_data: school.location,
-          level: school.level
+          level: school.level,
+          is_catholic: school.catholic
         })
       }
     };
@@ -236,7 +237,7 @@ const fillGeoData = async (data: Array<SchoolDomain>) => {
       });
   }
   return await resumeWriting().catch(async function (error) {
-    if (error.code === 'ProvisionedThroughputExceededExceptio') {
+    if (error.code === 'ProvisionedThroughputExceededException') {
       console.log('Eh! wait a minute');
       await sleep(20000);
       return await resumeWriting();
@@ -257,7 +258,18 @@ const scanDocuments = async (
     return items;
   } else {
     query.ExclusiveStartKey = tResult.LastEvaluatedKey;
-    return await scanDocuments(query, items);
+    return await scanDocuments(query, items).catch(async function (error) {
+      if (error.code === 'ProvisionedThroughputExceededException') {
+        console.log('Error while Reading Docs... Eh! wait a minute');
+        await sleep(20000);
+        return await scanDocuments(query, items);
+      }
+      console.error(
+        'An unexpected error has occured while reading Documents',
+        error
+      );
+      return [];
+    });
   }
 };
 
@@ -343,6 +355,13 @@ const putItemsByRegion = async (items: Array<SchoolDomain>): Promise<any> => {
 const toDomain = (itemsRaw: Array<any>): Array<SchoolDomain> => {
   const schoolItems = itemsRaw.map((item) => {
     const schoolByLevel = item.level.split(',').map((level: string) => {
+      let boundaries = [];
+      if (
+        item.location_data.boundaries &&
+        item.location_data.boundaries[level.trim()]
+      ) {
+        boundaries = item.location_data.boundaries[level.trim()];
+      }
       const school: SchoolDomain = {
         schoolId: item['school-id'],
         eqaoRating: item['eqao-rating'].toString(),
@@ -360,7 +379,7 @@ const toDomain = (itemsRaw: Array<any>): Array<SchoolDomain> => {
           latitude: item.location_data.latitude,
           longitude: item.location_data.longitude
         },
-        boundaries: item.location_data.boundaries[level.trim()] || []
+        boundaries
       };
       return school;
     });
@@ -376,7 +395,7 @@ const start = async () => {
       FilterExpression: 'attribute_exists(location_data)'
     };
     const allItems = await scanDocuments(query, []);
-    // console.log(allItems);
+    console.log('Total Number of Documents::', allItems.length);
 
     const schools = toDomain(allItems);
 
@@ -384,12 +403,12 @@ const start = async () => {
     await waitForTableActive('schoolsgeo');
     await fillGeoData(schools);
     console.log('Done writing geo entries');
-    console.log('Wait a minute');
-    await sleep(60000);
-    await createSchoolQueryTable();
-    await waitForTableActive('schools-query');
-    await putItemsByRegion(schools);
-    console.log('Done writing query entries');
+    // console.log('Wait a minute');
+    // await sleep(60000);
+    // await createSchoolQueryTable();
+    // await waitForTableActive('schools-query');
+    // await putItemsByRegion(schools);
+    // console.log('Done writing query entries');
     process.exit(0);
     // await putItemsByRatings(allItems);
   } catch (error) {

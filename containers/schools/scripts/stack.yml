@@ -27,6 +27,34 @@ services:
           memory: 1.5G
     networks:
       - redis
+  reverse-proxy:
+    image: 127.0.0.1:5000/nginx-server
+    depends_on:
+      - maps
+      - app
+    volumes:
+      - ~/.nginx/longcache/log:/var/log/nginx
+      - ~/.nginx/longcache/cache:/var/cache/nginx
+    ports:
+      - "80:80"
+    deploy:
+      replicas: 3
+      resources:
+        limits:
+          memory: 300M
+    networks:
+      - redis
+  maps:
+    image: klokantech/tileserver-gl
+    deploy:
+      replicas: 3
+      resources:
+        limits:
+          memory: 500M
+    volumes:
+      - /data/ubuntu:/data
+    networks:
+      - redis
   app:
     image: 127.0.0.1:5000/node-app
     depends_on:
@@ -39,7 +67,7 @@ services:
       - AWS_ACCESS_KEY=/run/secrets/aws_access_key
       - AWS_SECRET=/run/secrets/aws_secret
     deploy:
-      replicas: 5
+      replicas: 3
       resources:
         limits:
           cpus: "0.5"
@@ -57,9 +85,11 @@ services:
 
 secrets:
   aws_access_key:
-    file: /tmp/aws_access_key.txt
+    file: /home/ubuntu/aws_access_key.txt
   aws_secret:
-    file: /tmp/aws_secret.txt
+    file: /home/ubuntu/aws_secret.txt
 networks:
   redis:
+    external: true
+  host:
     external: true

@@ -6,17 +6,31 @@ import { areaDao, locationDao } from '../../domain/schools/daos/schools';
 import { SchoolMapper } from '../../domain/schools/mapper';
 import { SchoolResult } from '../../domain/schools/school';
 import { RedisCache } from './schools-repo-redis';
-
-const AWS_ACCESS = process.env.AWS_ACCESS_KEY;
-const AWS_SECRET = process.env.AWS_SECRET;
+import { readFileSync } from 'fs';
+import { GeoDataManager, GeoDataManagerConfiguration } from 'dynamodb-geo';
+import { unmarshall } from '@aws-sdk/util-dynamodb';
+const keyPath = process.env.AWS_ACCESS_KEY as string;
+const AWS_ACCESS = readFileSync(keyPath, {
+  encoding: 'utf-8'
+}).replace(/^\s+|\s+$/g, '');
+const secretPath = process.env.AWS_SECRET as string;
+const AWS_SECRET = readFileSync(secretPath, { encoding: 'utf-8' }).replace(
+  /^\s+|\s+$/g,
+  ''
+);
 const awsConfig = {
   accessKeyId: AWS_ACCESS,
   secretAccessKey: AWS_SECRET,
   region: 'us-east-2'
 };
+console.log(awsConfig);
 AWS.config.update(awsConfig);
 
+const ddBatch = new AWS.DynamoDB({ apiVersion: '2012-08-10' });
 const ddb = new AWS.DynamoDB.DocumentClient();
+const geoConfig = new GeoDataManagerConfiguration(ddBatch, 'schoolsgeo');
+geoConfig.hashKeyLength = 6;
+const schoolsGeoTableManager = new GeoDataManager(geoConfig);
 
 export class SchoolsRepo implements ISchoolRepo<SchoolResult> {
   private redisCache: ICache;
@@ -90,7 +104,32 @@ export class SchoolsRepo implements ISchoolRepo<SchoolResult> {
       return left(error) as SchoolResult;
     }
   }
-  async findSchoolsByLocation(location: locationDao): Promise<SchoolResult> {
-    throw new Error('Method not implemented.');
+  async findSchoolsByLocation(
+    location: locationDao
+  ): Promise<SchoolResult[] | SchoolResult> {
+    const { filters = null } = location;
+    if (!filters) {
+      console.log('No filters specified querying all data...');
+    }
+    const response = await schoolsGeoTableManager.queryRadius({
+      RadiusInMeter: location.radiusInMeters,
+      CenterPoint: location.centerPoint
+    });
+    console.log(response);
+    const results = response.map((school) => unmarshall(school));
+
+    let schoolDomainCollection = results.map((schoolRaw) =>
+      SchoolMapper.toDomain(schoolRaw)
+    );
+    schoolDomainCollection = schoolDomainCollection.filter((domain) => {
+      if (domain.isLeft()) {
+        console.error(
+          `Removing school from collection as it has errors ${domain.value}`
+        );
+        return false;
+      }
+      return true;
+    });
+    return schoolDomainCollection;
   }
 }
