@@ -13,7 +13,6 @@ Resources:
       CodeUri: control-ec2/
       Handler: app.lambdaHandler
       Runtime: nodejs14.x
-      Role: "arn:aws:iam::241056173073:role/LambdaRoleChattes1"
       Events:
         EC2Stop:
           Type: Api # More info about API Event Source: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#api
@@ -23,3 +22,17 @@ Resources:
       Environment:
         Variables:
           REGION: us-east-2
+
+Outputs:
+  # ServerlessRestApi is an implicit API created out of Events key under Serverless::Function
+  # Find out more about other implicit resources you can reference within SAM
+  # https://github.com/awslabs/serverless-application-model/blob/master/docs/internals/generated_resources.rst#api
+  EC2StopApi:
+    Description: "Control EC2 API gateway"
+    Value: !Sub "https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/ec2/"
+  EC2StopFunction:
+    Description: "Control EC2"
+    Value: !GetAtt EC2StopFunction.Arn
+  EC2StopFunctionIamRole:
+    Description: "Implicit IAM Role created for EC2 Stop Function"
+    Value: !GetAtt EC2StopFunctionRole.Arn
