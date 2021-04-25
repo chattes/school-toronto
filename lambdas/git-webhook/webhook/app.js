@@ -18,5 +18,10 @@ exports.lambdaHandler = async (event, context) => {
   console.log("Hello");
   console.log(event);
   console.log(context);
-  return 200;
+  return {
+    isBase64Encoded: false,
+    statusCode: 200,
+    headers: {},
+    body: "",
+  };
 };
