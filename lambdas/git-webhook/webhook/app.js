@@ -15,7 +15,7 @@ let response;
  *
  */
 exports.lambdaHandler = async (event, context) => {
-  console.log("Hello");
+  console.log("Hello World");
   console.log(event);
   console.log(context);
   return {
