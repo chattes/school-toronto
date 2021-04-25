@@ -18,4 +18,5 @@ exports.lambdaHandler = async (event, context) => {
   console.log("Hello");
   console.log(event);
   console.log(context);
+  return 200;
 };
