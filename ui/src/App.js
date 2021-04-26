@@ -4,6 +4,7 @@ import LandingPage from "./Landing";
 import { ToastContainer, toast } from "react-toastify";
 
 function App() {
+  console.log("Starting App..");
   return (
     <div className="App">
       <Switch>

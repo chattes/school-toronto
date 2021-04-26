@@ -24,6 +24,7 @@ exports.lambdaHandler = async (event, context) => {
       "i-0ac725efa6381f0e9",
     ];
 
+    
     const ec2 = new AWS.EC2({ region: "us-east-2" });
     await ec2.stopInstances({ InstanceIds: instances }).promise();
   } catch (error) {
