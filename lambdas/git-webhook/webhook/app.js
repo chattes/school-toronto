@@ -4,7 +4,7 @@ var AWS = require("aws-sdk");
 AWS.config.update({ region: "us-east-2" });
 let response;
 
-const pipeline = new AWS.CodePipeline({ apiVersion: "2010-03-31" });
+const pipeline = new AWS.CodePipeline({ apiVersion: "2015-07-09" });
 /**
  *
  * Event doc: https://docs.aws.amazon.com/apigateway/latest/developerguide/set-up-lambda-proxy-integrations.html#api-gateway-simple-proxy-for-lambda-input-format
