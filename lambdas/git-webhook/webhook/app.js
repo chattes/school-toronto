@@ -17,7 +17,6 @@ const pipeline = new CodePipeline({ region: "us-east-2" });
  *
  */
 exports.lambdaHandler = async (event, context) => {
-  console.log("Hello World");
   console.log("BODY:::", JSON.parse(event.body).ref);
 
   const isMainBranchRegex = /\/heads\/main/g;
