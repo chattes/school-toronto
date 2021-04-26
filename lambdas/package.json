@@ -13,6 +13,7 @@
     "eslint": "^7.25.0"
   },
   "dependencies": {
-    "@aws-sdk/client-codepipeline": "^3.13.1"
+    "@aws-sdk/client-codepipeline": "^3.13.1",
+    "aws-sdk": "^2.893.0"
   }
 }
