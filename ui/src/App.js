@@ -4,7 +4,8 @@ import LandingPage from "./Landing";
 import { ToastContainer, toast } from "react-toastify";
 
 function App() {
-  return (
+  console.log("Added this log");
+  eturn(
     <div className="App">
       <Switch>
         <Route exact path="/">
