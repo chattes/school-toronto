@@ -53,7 +53,14 @@ exports.lambdaHandler = async (event, context) => {
       if (deployLambdaStartEC2) console.log("Deploy Start EC2");
       if (deployLambdaWebhook) {
         console.log("Starting Pipeline for Lambda Git Webhook...");
-        pipeline.startPipelineExecution("LambdaStopEC2Pipeline-clone");
+        const webHookPipeline = await pipeline.getPipeline({
+          name: "LambdaStopEC2Pipeline-clone",
+        });
+        console.log(webHookPipeline);
+
+        await pipeline.startPipelineExecution({
+          name: "LambdaStopEC2Pipeline-clone",
+        });
       }
     }
   } else {
