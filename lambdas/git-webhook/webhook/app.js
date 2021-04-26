@@ -1,7 +1,9 @@
 // const axios = require('axios')
 // const url = 'http://checkip.amazonaws.com/';
+const { CodePipeline } = require("@aws-sdk/client-codepipeline");
 let response;
 
+const pipeline = new CodePipeline({ region: "us-east-2" });
 /**
  *
  * Event doc: https://docs.aws.amazon.com/apigateway/latest/developerguide/set-up-lambda-proxy-integrations.html#api-gateway-simple-proxy-for-lambda-input-format
@@ -16,36 +18,45 @@ let response;
  */
 exports.lambdaHandler = async (event, context) => {
   console.log("Hello World");
-  console.log(event);
-  console.log(context);
+  console.log("BODY:::", JSON.parse(event.body).ref);
 
   const isMainBranchRegex = /\/heads\/main/g;
   const isUIPipelineReg = /^ui\/.*/g;
   const isLambdaStopEC2Reg = /^lambdas\/stop-ec2\/.*?/g;
   const isLambdaStartEC2Reg = /^lambdas\/start-ec2\/.*?/g;
-  const startUIDeloyment = false;
-  const deployLambdaStopEC2 = false;
-  const deployLambdaStartEC2 = false;
+  const isLambdaWebhookReg = /^lambdas\/git-webhook\/.*?/g;
+  let startUIDeloyment = false;
+  let deployLambdaStopEC2 = false;
+  let deployLambdaStartEC2 = false;
+  let deployLambdaWebhook = false;
 
-  const body = event.body || null;
+  const body = JSON.parse(event.body);
   if (body) {
     const refs = body.ref || null;
-    const modified = body.modified || [];
+    const modified = body.head_commit.modified || [];
     if (refs && isMainBranchRegex.test(refs)) {
       console.log(
         "Changes Pushed to Main Branch.. We will match a pipeline..."
       );
+      console.log("MOD::", modified);
 
       for (let mod of modified) {
         if (isUIPipelineReg.test(mod)) startUIDeloyment = true;
         if (isLambdaStopEC2Reg.test(mod)) deployLambdaStopEC2 = true;
         if (isLambdaStartEC2Reg.test(mod)) deployLambdaStartEC2 = true;
+        if (isLambdaWebhookReg.test(mod)) deployLambdaWebhook = true;
       }
 
       if (startUIDeloyment) console.log("Deploy UI");
       if (deployLambdaStopEC2) console.log("Deploy Lambda STOP EC2");
       if (deployLambdaStartEC2) console.log("Deploy Start EC2");
+      if (deployLambdaWebhook) {
+        console.log("Starting Pipeline for Lambda Git Webhook...");
+        pipeline.startPipelineExecution("LambdaStopEC2Pipeline-clone");
+      }
     }
+  } else {
+    console.log("No Body :(");
   }
   return {
     isBase64Encoded: false,

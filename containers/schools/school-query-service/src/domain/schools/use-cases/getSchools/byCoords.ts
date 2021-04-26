@@ -19,8 +19,8 @@ export class GetSchoolByCoords
       radiusInMeters: request.radiusInMeters,
       filters: request.filters
     };
-    const result = await this.repo.findSchoolsByLocation(locationData);
-    return result as Array<SchoolResult>;
+    const result = await this.repo.findSchoolsByLocation(locationData) as Array<SchoolResult> ;
+    return result ;
   }
 
   public static create(repo: ISchoolRepo<SchoolResult>): GetSchoolByCoords {
