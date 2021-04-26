@@ -31,7 +31,7 @@ exports.lambdaHandler = async (event, context) => {
   let deployLambdaWebhook = false;
 
   const body = JSON.parse(event.body);
-  console.log("Received Webhook test", body);
+  console.log("Received Webhook Tst - Should BE DEPLOYED", body);
   if (body) {
     const refs = body.ref || null;
     const modified = body.head_commit.modified || [];
