@@ -18,7 +18,6 @@ const pipeline = new AWS.CodePipeline({ apiVersion: "2015-07-09" });
  *
  */
 exports.lambdaHandler = async (event, context) => {
-  console.log("This should be deployed automagically!");
   console.log("BODY:::", JSON.parse(event.body).ref);
 
   const isMainBranchRegex = /\/heads\/main/g;
@@ -68,9 +67,11 @@ exports.lambdaHandler = async (event, context) => {
   };
 };
 
+// Execute a pipeline
+
 const executePipelinePromise = (pipelineName) => {
   return new Promise((res, rej) => {
-    pipeline.StartPipelineExecution({ name: pipelineName }, (err, data) => {
+    pipeline.startPipelineExecution({ name: pipelineName }, (err, data) => {
       if (err) {
         console.log("Unable to start pipeline");
         console.log(err, err.stack);
