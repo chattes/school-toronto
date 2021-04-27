@@ -18,6 +18,7 @@ const pipeline = new AWS.CodePipeline({ apiVersion: "2015-07-09" });
  *
  */
 exports.lambdaHandler = async (event, context) => {
+  console.log("This should be deployed automagically!");
   console.log("BODY:::", JSON.parse(event.body).ref);
 
   const isMainBranchRegex = /\/heads\/main/g;
@@ -53,14 +54,7 @@ exports.lambdaHandler = async (event, context) => {
       if (deployLambdaStartEC2) console.log("Deploy Start EC2");
       if (deployLambdaWebhook) {
         console.log("Starting Pipeline for Lambda Git Webhook...");
-        const webHookPipeline = await pipeline.getPipeline({
-          name: "LambdaStopEC2Pipeline-clone",
-        });
-        console.log(webHookPipeline);
-
-        await pipeline.startPipelineExecution({
-          name: "LambdaStopEC2Pipeline-clone",
-        });
+        await executePipelinePromise("LambdaStopEC2Pipeline-clone");
       }
     }
   } else {
@@ -72,4 +66,18 @@ exports.lambdaHandler = async (event, context) => {
     headers: {},
     body: "",
   };
+};
+
+const executePipelinePromise = (pipelineName) => {
+  return new Promise((res, rej) => {
+    pipeline.StartPipelineExecution({ name: pipelineName }, (err, data) => {
+      if (err) {
+        console.log("Unable to start pipeline");
+        console.log(err, err.stack);
+        rej(err);
+      }
+      console.log("Pipeline Started Succesfully", data);
+      res(data);
+    });
+  });
 };
