@@ -3,7 +3,7 @@ version: 0.1
 phases:
   install:
     commands:
-      - aws cloudformation package --template-file lambdas/git-webhook/template.yaml --s3-bucket schools-lambdas --output-template-file outputSamTemplate.yaml
+      - aws cloudformation package --template-file lambdas/git_webhook/template.yaml --s3-bucket schools-lambdas --output-template-file outputSamTemplate.yaml
 artifacts:
   type: zip
   files:
