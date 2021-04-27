@@ -1,0 +1,25 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Transform: AWS::Serverless-2016-10-31
+Description: Controls EC2 Instances- Start EC2 Instances
+# More info about Globals: https://github.com/awslabs/serverless-application-model/blob/master/docs/globals.rst
+Globals:
+  Function:
+    Timeout: 3
+
+Resources:
+  EC2StartFunction:
+    Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
+    Properties:
+      CodeUri: start-ec2/
+      Handler: app.lambdaHandler
+      Runtime: nodejs14.x
+      Role: "arn:aws:iam::241056173073:role/LambdaRoleChattes1"
+      Events:
+        EC2Start:
+          Type: Api # More info about API Event Source: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#api
+          Properties:
+            Path: /ec2/start
+            Method: get
+      Environment:
+        Variables:
+          REGION: us-east-2
