@@ -22,9 +22,7 @@ exports.lambdaHandler = async (event, context) => {
 
   const isMainBranchRegex = /\/heads\/main/g;
   const isUIPipelineReg = /^ui\/.*/g;
-  const isLambdaStopEC2Reg = /^lambdas\/stop-ec2\/.*?/g;
-  const isLambdaStartEC2Reg = /^lambdas\/start-ec2\/.*?/g;
-  const isLambdaWebhookReg = /^lambdas\/git-webhook\/.*?/g;
+  const lambdaCapture = /(?<top>^lambdas)\/(?<lname>.*?)\/(?<rest>.*)$/gm;
   let startUIDeloyment = false;
   let deployLambdaStopEC2 = false;
   let deployLambdaStartEC2 = false;
@@ -41,20 +39,22 @@ exports.lambdaHandler = async (event, context) => {
       );
       console.log("MOD::", modified);
 
-      for (let mod of modified) {
-        if (isUIPipelineReg.test(mod)) startUIDeloyment = true;
-        if (isLambdaStopEC2Reg.test(mod)) deployLambdaStopEC2 = true;
-        if (isLambdaStartEC2Reg.test(mod)) deployLambdaStartEC2 = true;
-        if (isLambdaWebhookReg.test(mod)) deployLambdaWebhook = true;
-      }
+      const lambdaPipeLinesPromises = modified
+        .filter((mod) => {
+          return lambdaCapture.exec(mod) !== null;
+        })
+        .map((mod) => {
+          return `lambda_${lambdaCapture.exec(mod).groups.lname}_pipeline`;
+        })
+        .map((pipeline) => {
+          console.log(`Executing Pipeline..`, pipeline);
+          return executePipelinePromise(pipeline);
+        });
 
-      if (startUIDeloyment) console.log("Deploy UI");
-      if (deployLambdaStopEC2) console.log("Deploy Lambda STOP EC2");
-      if (deployLambdaStartEC2) console.log("Deploy Start EC2");
-      if (deployLambdaWebhook) {
-        console.log("Starting Pipeline for Lambda Git Webhook...");
-        await executePipelinePromise("LambdaStopEC2Pipeline-clone");
-      }
+      const pipeLineExecutionResults = await Promise.all(
+        lambdaPipeLinesPromises
+      );
+      console.log(`Pipeline Execution results`, pipeLineExecutionResults);
     }
   } else {
     console.log("No Body :(");
