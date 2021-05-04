@@ -44,6 +44,7 @@ exports.lambdaHandler = async (event, context) => {
           return lambdaCapture.exec(mod) !== null;
         })
         .map((mod) => {
+          console.log(`Mod Pipline ...`, mod);
           return `lambda_${lambdaCapture.exec(mod).groups.lname}_pipeline`;
         })
         .map((pipeline) => {
@@ -54,7 +55,6 @@ exports.lambdaHandler = async (event, context) => {
       const pipeLineExecutionResults = await Promise.all(
         lambdaPipeLinesPromises
       );
-      console.log(`Pipeline Execution results`, pipeLineExecutionResults);
     }
   } else {
     console.log("No Body :(");
