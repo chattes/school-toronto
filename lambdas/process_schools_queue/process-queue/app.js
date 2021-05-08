@@ -79,7 +79,7 @@ const scanDocuments = async (query) => {
 exports.lambdaHandler = async (event, context) => {
   try {
     let dateBefore = new Date().getTime() - 60000 * 60 * 24 * 19;
-    console.log(dateBefore);
+    console.log("Check website data not exists");
     /**
     const query = {
       TableName: "schools-toronto",
