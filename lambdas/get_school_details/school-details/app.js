@@ -97,7 +97,7 @@ exports.lambdaHandler = async (event, context) => {
       };
 
       console.log(
-        "Updating school details data...",
+        "Updating school details data to get website",
         JSON.stringify(updateSchoolData)
       );
 
