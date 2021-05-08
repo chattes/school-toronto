@@ -101,7 +101,8 @@ exports.lambdaHandler = async (event, context) => {
     const query = {
       TableName: "schools-toronto",
       ProjectionExpression: "#id,#rating, #school_url, #school_name, #record",
-      FilterExpression: "attribute_not_exists(location_data)",
+      // FilterExpression: "attribute_not_exists(location_data)",
+      FilterExpression: "attribute_not_exists(website)",
       ExpressionAttributeNames: {
         "#record": "record_last_processed",
         "#id": "school-id",
