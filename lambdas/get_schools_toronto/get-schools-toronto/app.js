@@ -6,7 +6,7 @@ let response;
 aws.config.update({ region: "us-east-2" });
 const ddb = new aws.DynamoDB({ apiVersion: "2012-08-10" });
 const dynamoClient = new aws.DynamoDB.DocumentClient();
-const DO_DIFFING = false;
+const DO_DIFFING = true;
 
 /**
  *
@@ -22,7 +22,16 @@ const DO_DIFFING = false;
  */
 exports.lambdaHandler = async (event, context) => {
   try {
-    const boards = ["pdsb", "dcdsb", "ddsb", "dpcdsb", "hcdsb", "hdsb"];
+    const boards = [
+      "tdsb",
+      "tcdsb",
+      "pdsb",
+      "dcdsb",
+      "ddsb",
+      "dpcdsb",
+      "hcdsb",
+      "hdsb",
+    ];
 
     const boardRequests = boards.map((board) =>
       axios({
