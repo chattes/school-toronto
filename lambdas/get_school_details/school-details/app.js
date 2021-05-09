@@ -56,7 +56,7 @@ exports.lambdaHandler = async (event, context) => {
         grades = "",
         website = "",
         phone_number = "",
-      } = response;
+      } = data;
 
       // const updateSchoolData = {
 
