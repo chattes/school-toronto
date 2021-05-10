@@ -1,8 +1,9 @@
 version: 0.1
 phases:
-  pre_build:
+  build:
     commands:
       - echo installing npm packages
+      - cd $CODEBUILD_SRC_DIR/get-schools-toronto
       - npm install
   install:
     commands:
