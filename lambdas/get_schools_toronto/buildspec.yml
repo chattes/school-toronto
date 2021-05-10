@@ -1,5 +1,9 @@
 version: 0.1
 phases:
+  pre-build:
+    commands:
+      - echo installing npm packages
+      - npm install
   install:
     commands:
       - aws cloudformation package --template-file lambdas/get_schools_toronto/template.yaml --s3-bucket schools-lambdas --output-template-file outputSamTemplate.yaml
