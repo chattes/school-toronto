@@ -3,7 +3,6 @@ phases:
   pre_build:
     commands:
       - echo installing npm packages
-      - cd get-schools-toronto
       - npm install
   install:
     commands:
