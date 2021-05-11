@@ -22,7 +22,6 @@ exports.lambdaHandler = async (event, context) => {
 
   const isMainBranchRegex = /\/heads\/main/g;
   const isUIPipelineReg = /^ui\/.*/g;
-  const lambdaCapture = /(?<top>^lambdas)\/(?<lname>.*?)\/(?<rest>.*)$/gm;
   let startUIDeloyment = false;
   let deployLambdaStopEC2 = false;
   let deployLambdaStartEC2 = false;
@@ -42,9 +41,13 @@ exports.lambdaHandler = async (event, context) => {
 
       const lambdaPipeLinesPromises = mods
         .filter((mod) => {
+          const lambdaCapture =
+            /(?<top>^lambdas)\/(?<lname>.*?)\/(?<rest>.*)$/gm;
           return lambdaCapture.exec(mod) !== null;
         })
         .map((mod) => {
+          const lambdaCapture =
+            /(?<top>^lambdas)\/(?<lname>.*?)\/(?<rest>.*)$/gm;
           console.log(`Mod Pipline ...`, mod);
           const lambdaName = lambdaCapture.exec(mod);
           console.log("Captures", lambdaName);
