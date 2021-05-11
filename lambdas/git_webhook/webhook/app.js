@@ -32,14 +32,15 @@ exports.lambdaHandler = async (event, context) => {
   console.log("Received Webhook Tst - Should BE DEPLOYED", body);
   if (body) {
     const refs = body.ref || null;
-    const modified = body.head_commit.modified || [];
+    const commits = body.commits;
+    const mods = commits.map((commit) => commit.modified).flat();
+    console.log("All Mods::", mods);
     if (refs && isMainBranchRegex.test(refs)) {
       console.log(
         "Changes Pushed to Main Branch.. We will match a pipeline..."
       );
-      console.log("MOD::", modified);
 
-      const lambdaPipeLinesPromises = modified
+      const lambdaPipeLinesPromises = mods
         .filter((mod) => {
           return lambdaCapture.exec(mod) !== null;
         })
