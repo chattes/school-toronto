@@ -54,7 +54,7 @@ exports.lambdaHandler = async (event, context) => {
           return `lambda_${lambdaName.groups.lname}_pipeline`;
         })
         .map((pipeline) => {
-          console.log(`Executing Pipeline..`, pipeline);
+          console.log(`Executing Pipeline Name..`, pipeline);
           return executePipelinePromise(pipeline);
         });
 

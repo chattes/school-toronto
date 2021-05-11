@@ -16,7 +16,7 @@ const AWS = require("aws-sdk");
  *
  */
 exports.lambdaHandler = async (event, context) => {
-  console.log("Stop All EC2 Instances");
+  console.log("Stop All EC2 Instance");
   try {
     const instances = [
       "i-085ef931354e9f94e",
