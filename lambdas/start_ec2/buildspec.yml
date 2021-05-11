@@ -2,7 +2,7 @@ version: 0.1
 phases:
   install:
     commands:
-      - echo start install phases
+      - echo start install phase
       - npm --prefix $CODEBUILD_SRC_DIR/lambdas/start_ec2/start-ec2 install
       - aws cloudformation package --template-file lambdas/start_ec2/template.yaml --s3-bucket schools-lambdas --output-template-file outputSamTemplate.yaml
 artifacts:
