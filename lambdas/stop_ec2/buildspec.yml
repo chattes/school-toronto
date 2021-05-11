@@ -2,6 +2,8 @@ version: 0.1
 phases:
   install:
     commands:
+      - echo start install phases
+      - npm --prefix $CODEBUILD_SRC_DIR/lambdas/stop_ec2/stop-ec2 install
       - aws cloudformation package --template-file lambdas/stop_ec2/template.yaml --s3-bucket schools-lambdas --output-template-file outputSamTemplate.yaml
 artifacts:
   type: zip
