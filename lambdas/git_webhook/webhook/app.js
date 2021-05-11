@@ -45,7 +45,9 @@ exports.lambdaHandler = async (event, context) => {
         })
         .map((mod) => {
           console.log(`Mod Pipline ...`, mod);
-          return `lambda_${lambdaCapture.exec(mod).groups.lname}_pipeline`;
+          const lambdaName = lambdaCapture.exec(mod);
+          console.log("Captures", lambdaName);
+          return `lambda_${lambdaName.groups.lname}_pipeline`;
         })
         .map((pipeline) => {
           console.log(`Executing Pipeline..`, pipeline);
