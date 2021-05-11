@@ -16,6 +16,7 @@ const AWS = require("aws-sdk");
  *
  */
 exports.lambdaHandler = async (event, context) => {
+  console.log("Start Instances");
   try {
     const instances = [
       "i-00ab52aecf16acd07",
