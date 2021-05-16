@@ -2,7 +2,7 @@ version: 0.1
 phases:
   install:
     commands:
-      - echo start install phases
+      - echo start install phase
       - npm --prefix $CODEBUILD_SRC_DIR/lambdas/get_schools_details/school-details install
       - aws cloudformation package --template-file lambdas/get_school_details/template.yaml --s3-bucket schools-lambdas --output-template-file outputSamTemplate.yaml
 artifacts:
