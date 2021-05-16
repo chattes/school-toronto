@@ -34,7 +34,7 @@ exports.lambdaHandler = async (event, context) => {
         return response;
       }
       // console.log("Fetching school coordinates...")
-      console.log("Fetching school details...");
+      console.log("Fetching school details..");
       const response = await axios({
         method: "get",
         url: buildDetailURL(schoolUrl),
