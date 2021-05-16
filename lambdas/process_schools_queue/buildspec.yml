@@ -2,7 +2,7 @@ version: 0.1
 phases:
   install:
     commands:
-      - echo start install phases
+      - echo start install phase
       - npm --prefix $CODEBUILD_SRC_DIR/lambdas/process_schools_queue/process-queue install
       - aws cloudformation package --template-file lambdas/process_schools_queue/template.yaml --s3-bucket schools-lambdas --output-template-file outputSamTemplate.yaml
 artifacts:
